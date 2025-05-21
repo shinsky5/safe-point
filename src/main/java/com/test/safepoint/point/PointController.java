@@ -13,7 +13,7 @@ public class PointController {
 
     @GetMapping("/{userId}")
     public int getBalance(@PathVariable Long userId) {
-        // 구현 예정
+        // 구현 예정 시작
         return 0;
     }
 

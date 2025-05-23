@@ -1,11 +1,10 @@
-package com.test.safepoint.integration;
+package com.test.safepoint.point;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.test.safepoint.point.PointController;
-import com.test.safepoint.point.PointService;
+import com.test.safepoint.database.UserTables;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -16,8 +15,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = PointController.class)
-@WebMvcTest(PointController.class)
-public class ConcurrencyIntegrationTest {
+@AutoConfigureMockMvc
+class PointControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -28,11 +27,14 @@ public class ConcurrencyIntegrationTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void 포인트_충전_요청을_성공적으로_처리한다() throws Exception {
+    void charge() throws Exception {
         // given
-        Long userId = 1L;
-        int amount = 1000;
 
+        UserTables user = new UserTables();
+        User fst = user.save(1000);
+
+        Long userId = fst.getId();
+        int amount = fst.getPoints();
         // PointService.charge(...)는 void 메서드이므로 doNothing() 설정
         doNothing().when(pointService).charge(userId, amount);
 
@@ -43,5 +45,13 @@ public class ConcurrencyIntegrationTest {
                                 .content(objectMapper.writeValueAsString(amount))
                 )
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void getBalance() {
+    }
+
+    @Test
+    void use() {
     }
 }
